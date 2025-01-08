@@ -1,15 +1,17 @@
 import { unstable_expirePath } from "next/cache";
 
-export async function revalidateTimestampPage(key: string) {
+export async function revalidateTimestampPage(key: string, id: string) {
   const path = `/timestamp/key/${encodeURIComponent(key)}`;
 
   const sleepDuration = getSleepDuration();
   if (sleepDuration > 0) {
-    console.log(`revalidateTimestampPage :: sleeping for ${sleepDuration} ms`);
+    console.log(
+      `[${id}] revalidateTimestampPage :: sleeping for ${sleepDuration} ms`
+    );
     await sleep(sleepDuration);
   }
 
-  console.log("revalidateTimestampPage :: revalidating", path);
+  console.log(`[${id}] revalidateTimestampPage :: revalidating`, path);
   unstable_expirePath(path);
 }
 

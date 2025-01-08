@@ -6,14 +6,15 @@ export function middleware(request: NextRequest) {
   if (request.method !== "GET") {
     return;
   }
-  const id = Math.floor(Math.random() * 1000 + performance.now()) % 10000;
+  const id =
+    (Math.floor(Math.random() * 1000 + performance.now()) % 10000) + "";
 
   if (url.pathname === "/triggers-middleware/after") {
     console.log(`[${id}] middleware hit for path`, url.pathname);
     after(async () => {
       console.log(`[${id}] after() triggered for path`, url.pathname);
       try {
-        await triggerRevalidate(url.pathname, url);
+        await triggerRevalidate(url.pathname, url, id);
       } catch (err) {
         console.error(`[${id}] an error occurred while revalidating:`, err);
       }
@@ -26,7 +27,7 @@ export function middleware(request: NextRequest) {
         await sleep(300);
         console.log(`[${id}] waitUntil() triggered for path`, url.pathname);
         try {
-          await triggerRevalidate(url.pathname, url);
+          await triggerRevalidate(url.pathname, url, id);
         } catch (err) {
           console.error(`[${id}] an error occurred while revalidating:`, err);
         }
@@ -36,10 +37,15 @@ export function middleware(request: NextRequest) {
   }
 }
 
-async function triggerRevalidate(pathToRevalidate: string, url: URL) {
+async function triggerRevalidate(
+  pathToRevalidate: string,
+  url: URL,
+  id: string
+) {
   // we can't call unstable_expirePath from middleware, so we need to do it via an endpoint instead
   const postUrl = new URL("/timestamp/trigger-revalidate", url.href);
   postUrl.searchParams.append("path", pathToRevalidate);
+  postUrl.searchParams.append("id", id);
 
   const response = await fetch(postUrl, { method: "POST" });
   if (!response.ok) {
