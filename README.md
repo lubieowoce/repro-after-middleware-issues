@@ -1,36 +1,16 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Structure
 
-## Getting Started
+This repro has two components:
 
-First, run the development server:
+1. The Next.js app -- it needs to trigger side effects in `waitUntil`/`after`. We observe those using
+2. The pinger -- an instance of `pinger.mjs` running somewhere accessible publicly (because the Next.js app needs to send requests to it). Note that this is stateful - it keeps a list of recent requests in memory.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Running the repro
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Deploy the `pinger.mjs` server at some public URL. in the next.js app, set the `PINGER_BASE_URL` env var to that (including 'http://')
+- Deploy the Next.js app to vercel
+- Visit `/`
+- From there each link will trigger a different side-effect in middleware (reading `middleware.ts` will make this make more sense)
+- Go to `/logs` to see if/when the pings were performed (it auto-refreshes)
+- Observe that pings from `waitUntil`/`event.waitTuntil` and `after` (which uses `waitUntil`) happen with a big delay or not at all
+  - Notably, sometimes we'll only receive the ping when _another_ ping was triggered, like something gets stuck somewhere. the "instant" link is good for this

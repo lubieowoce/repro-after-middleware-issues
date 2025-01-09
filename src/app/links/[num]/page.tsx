@@ -7,34 +7,31 @@ export default async function Page({
 }) {
   const { num } = await params;
   return (
-    <main>
-      <Links href={`/triggers-middleware/${num}/after`} />
-      <Links href={`/triggers-middleware/${num}/waitUntil`} />
-      <Links href={`/triggers-middleware/${num}/event.waitUntil`} />
-      <hr />
-      <Link prefetch={false} href={`/`}>
-        New id
+    <main style={{ fontFamily: "monospace" }}>
+      <h3>Trigger a ping from middleware:</h3>
+      <Link href={`/triggers-middleware/${num}/after`}>inside after()</Link>
+      <br />
+      <Link href={`/triggers-middleware/${num}/waitUntil`}>
+        inside waitUntil()
       </Link>
+      <br />
+      <Link href={`/triggers-middleware/${num}/event.waitUntil`}>
+        inside event.waitUntil()
+      </Link>
+      <br />
+      <Link href={`/triggers-middleware/${num}/instant`}>
+        instantly (no wrappers)
+      </Link>
+      <br />
+      <hr />
+      <Link prefetch={false} href="/logs">
+        view ping logs
+      </Link>
+      <br />
+      <Link prefetch={false} href={`/`}>
+        New random number
+      </Link>
+      <br />
     </main>
-  );
-}
-
-function Links({ href }: { href: string }) {
-  return (
-    <div style={{ border: "1px solid lightgrey", padding: "0.5em" }}>
-      <div>
-        <Link href={href} prefetch={false}>
-          {href}
-        </Link>
-      </div>
-      <div>
-        <Link
-          href={"/timestamp/key/" + encodeURIComponent(href)}
-          prefetch={false}
-        >
-          timestamp for &quot;{href}&quot;
-        </Link>
-      </div>
-    </div>
   );
 }
