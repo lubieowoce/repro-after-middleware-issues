@@ -3,7 +3,7 @@
 This repro has two components:
 
 1. The Next.js app -- it needs to trigger side effects in `waitUntil`/`after`. We observe those using
-2. The pinger -- an instance of `pinger.mjs` running somewhere accessible publicly (because the Next.js app needs to send requests to it). Note that this is stateful - it keeps a list of recent requests in memory.
+2. The pinger -- an instance of `pinger.mjs` running somewhere accessible publicly (because the Next.js app needs to send requests to it). It keeps a list of recent requests (pings) in memory. We use these logs as a way to track if something like an `after` executed.
 
 ### Running the repro
 
