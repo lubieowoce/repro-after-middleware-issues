@@ -25,9 +25,12 @@ export default async function Page() {
   return (
     <>
       <main style={{ fontFamily: "monospace" }}>
-        <div style={{ opacity: 0.5 }}>(refreshes every {REFRESH_SECONDS}s)</div>
+        <div style={{ opacity: 0.5 }}>
+          (refreshes every {REFRESH_SECONDS}s, newest at the top)
+        </div>
         <br />
-        {pings.map((entry) => (
+
+        {[...pings].reverse().map((entry) => (
           <div key={entry.timestamp}>{formatEntry(entry)}</div>
         ))}
       </main>
