@@ -10,17 +10,22 @@ export default async function Page({
     <main style={{ fontFamily: "monospace" }}>
       <div>
         <h3>Try to trigger a ping from middleware</h3>
-        <Link href={`/triggers-middleware/${num}/after`}>inside after()</Link>
+        <Link prefetch={false} href={`/triggers-middleware/${num}/after`}>
+          inside after()
+        </Link>
         <br />
-        <Link href={`/triggers-middleware/${num}/waitUntil`}>
+        <Link prefetch={false} href={`/triggers-middleware/${num}/waitUntil`}>
           inside waitUntil()
         </Link>
         <br />
-        <Link href={`/triggers-middleware/${num}/event.waitUntil`}>
+        <Link
+          prefetch={false}
+          href={`/triggers-middleware/${num}/event.waitUntil`}
+        >
           inside event.waitUntil()
         </Link>
         <br />
-        <Link href={`/triggers-middleware/${num}/instant`}>
+        <Link prefetch={false} href={`/triggers-middleware/${num}/instant`}>
           instantly (no wrappers)
         </Link>
       </div>
