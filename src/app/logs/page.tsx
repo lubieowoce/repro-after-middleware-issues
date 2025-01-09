@@ -40,7 +40,7 @@ export default async function Page({
             defaultValue={filter ?? undefined}
             placeholder="Filter logs"
           />
-          <button type="submit">Go</button>
+          <button type="submit">Filter</button>
         </Form>
         <br />
         {[...pings]
