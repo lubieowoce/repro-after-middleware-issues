@@ -1,30 +1,8 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { connection } from "next/server";
 
-export default function Page() {
-  return (
-    <main>
-      <Links href={"/triggers-middleware/after"} />
-      <Links href={"/triggers-middleware/waitUntil"} />
-    </main>
-  );
-}
-
-function Links({ href }: { href: string }) {
-  return (
-    <div>
-      <div>
-        <Link href={href} prefetch={false}>
-          {href}
-        </Link>
-      </div>
-      <div>
-        <Link
-          href={"/timestamp/key/" + encodeURIComponent(href)}
-          prefetch={false}
-        >
-          timestamp for &quot;{href}&quot;
-        </Link>
-      </div>
-    </div>
-  );
+export default async function Page() {
+  await connection();
+  const num = (Math.floor(Math.random() * 1000) + "").padStart(4, "0");
+  redirect("/links/" + num);
 }

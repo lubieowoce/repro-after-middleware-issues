@@ -1,7 +1,13 @@
 import { waitUntil } from "@vercel/functions";
-import { after, MiddlewareConfig, NextRequest } from "next/server";
+import {
+  after,
+  MiddlewareConfig,
+  NextFetchEvent,
+  NextRequest,
+} from "next/server";
+import { match } from "path-to-regexp";
 
-export function middleware(request: NextRequest) {
+export function middleware(request: NextRequest, event: NextFetchEvent) {
   const url = new URL(request.url);
   if (request.method !== "GET") {
     return;
@@ -9,7 +15,7 @@ export function middleware(request: NextRequest) {
   const id =
     (Math.floor(Math.random() * 1000 + performance.now()) % 10000) + "";
 
-  if (url.pathname === "/triggers-middleware/after") {
+  if (match("/triggers-middleware/:num/after")(url.pathname)) {
     console.log(`[${id}] middleware hit for path`, url.pathname);
     after(async () => {
       console.log(`[${id}] after() triggered for path`, url.pathname);
@@ -20,7 +26,7 @@ export function middleware(request: NextRequest) {
       }
       console.log(`[${id}] after() finished for path`, url.pathname);
     });
-  } else if (url.pathname === "/triggers-middleware/waitUntil") {
+  } else if (match("/triggers-middleware/:num/waitUntil")(url.pathname)) {
     console.log(`[${id}] middleware hit for path`, url.pathname);
     waitUntil(
       (async () => {
@@ -32,6 +38,26 @@ export function middleware(request: NextRequest) {
           console.error(`[${id}] an error occurred while revalidating:`, err);
         }
         console.log(`[${id}] waitUntil() finished for path`, url.pathname);
+      })()
+    );
+  } else if (match("/triggers-middleware/:num/event.waitUntil")(url.pathname)) {
+    console.log(`[${id}] middleware hit for path`, url.pathname);
+    event.waitUntil(
+      (async () => {
+        await sleep(300);
+        console.log(
+          `[${id}] event.waitUntil() triggered for path`,
+          url.pathname
+        );
+        try {
+          await triggerRevalidate(url.pathname, url, id);
+        } catch (err) {
+          console.error(`[${id}] an error occurred while revalidating:`, err);
+        }
+        console.log(
+          `[${id}] event.waitUntil() finished for path`,
+          url.pathname
+        );
       })()
     );
   }
@@ -60,5 +86,5 @@ function sleep(ms: number) {
 }
 
 export const config: MiddlewareConfig = {
-  matcher: ["/triggers-middleware/:path"],
+  matcher: ["/triggers-middleware/:path*"],
 };
