@@ -56,9 +56,7 @@ export default async function Page({
   );
 }
 
-const formatEntry = ({ timestamp, params, userAgent }: Entry) =>
+const formatEntry = ({ timestamp, params }: Entry) =>
   `[${new Date(
     timestamp
-  ).toISOString()}] pinged at ${timestamp} ${JSON.stringify(
-    params
-  )} | ${userAgent}`;
+  ).toISOString()}] pinged at ${timestamp} ${JSON.stringify(params)}`;
