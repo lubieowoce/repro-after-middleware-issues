@@ -1,4 +1,4 @@
-import { connection } from "next/server";
+import Form from "next/form";
 import { Refresh } from "./refresh";
 
 type Entry = {
@@ -9,8 +9,11 @@ type Entry = {
 
 const REFRESH_SECONDS = 3;
 
-export default async function Page() {
-  await connection();
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const res = await fetch(new URL("/logs", process.env.PINGER_BASE_URL), {
     headers: { accept: "application/json" },
     cache: "no-store",
@@ -21,6 +24,7 @@ export default async function Page() {
   }
 
   const pings = (await res.json()) as Entry[];
+  const filter = (await searchParams).filter as string | null;
 
   return (
     <>
@@ -29,10 +33,23 @@ export default async function Page() {
           (refreshes every {REFRESH_SECONDS}s, newest at the top)
         </div>
         <br />
-
-        {[...pings].reverse().map((entry) => (
-          <div key={entry.timestamp}>{formatEntry(entry)}</div>
-        ))}
+        <Form action="/logs">
+          <input
+            type="text"
+            name="filter"
+            defaultValue={filter ?? undefined}
+            placeholder="Filter logs"
+          />
+          <button type="submit">Go</button>
+        </Form>
+        <br />
+        {[...pings]
+          .reverse()
+          .map((entry) => [entry, formatEntry(entry)] as const)
+          .filter(([, line]) => (filter ? line.includes(filter) : true))
+          .map(([entry, line]) => (
+            <div key={entry.timestamp}>{line}</div>
+          ))}
       </main>
       <Refresh interval={REFRESH_SECONDS * 1000} />
     </>
